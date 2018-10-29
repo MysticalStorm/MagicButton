@@ -3,45 +3,132 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-.button {
+
+body {
+    background: #333333
+}
+
+#content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#button1 {
   padding: 15px 25px;
   font-size: 24px;
   text-align: center;
   cursor: pointer;
   outline: none;
   color: #fff;
-  background-color: #4CAF50;
+  background-color: #0066CC;
   border: none;
   border-radius: 15px;
-  box-shadow: 0 9px #999;
+  box-shadow: 0 9px #6699CC;
 }
 
-.button:hover {background-color: #3e8e41}
-
-.button:active {
-  background-color: #3e8e41;
-  box-shadow: 0 5px #666;
+#button1:active {
+  box-shadow: 0 5px #6699CC;
   transform: translateY(4px);
 }
+
+#button2 {
+  padding: 15px 25px;
+  font-size: 24px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #CC9966;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #996633;
+}
+
+#button2:active {
+  box-shadow: 0 5px #996600;
+  transform: translateY(4px);
+}
+
+.test {
+  box-shadow: 0 5px #996600;
+  transform: translateY(4px);
+}
+
 </style>
 
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script type="text/javascript" charset="utf-8">
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
-    socket.on('connect', function() {
-        socket.emit('my event');
-    });
-    function clientClick() {
-        print(socket.emit('click'))
-    }
+$( document ).ready(function() {
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        var user = new Date().getTime();
+
+        socket.on('connect', function() {
+            console.log("Connected")
+            socket.emit('event.connect', 'Im connected');
+        });
+        socket.on('disconnect', function () {
+            console.log("Disconnected")
+        });
+        socket.on('event.update', function(array) {
+            id = array[0]
+            clicks = array[1]
+            date = array[2]
+
+            console.log(clicks)
+            if (id == 0) {
+
+            console.log( user )
+            if (date != user) {
+                $("#button1").addClass('test')
+                setTimeout(function(){
+                    $('#button1').removeClass('test');
+                }, 100);
+            }
+
+                $( "#button1" ).html(clicks);
+            } else {
+
+            if (date != user) {
+                $("#button2").addClass('test')
+                setTimeout(function(){
+                    $('#button2').removeClass('test');
+                }, 100);
+            }
+
+                $( "#button2" ).html(clicks);
+            }
+        });
+        $( "#button1" ).click(function() {
+            if (socket.connected) {
+                socket.emit('event.click', [0, user], function(clicks) {
+                    console.log(clicks)
+                });
+            } else {
+                console.log("not connected")
+            }
+        });
+        $( "#button2" ).click(function() {
+            if (socket.connected) {
+                socket.emit('event.click', [1, user], function(clicks) {
+                    console.log(clicks)
+                });
+            } else {
+                console.log("not connected")
+            }
+        });
+});
 </script>
 
 </head>
 <body>
 
-<h2>Animated Buttons - "Pressed Effect"</h2>
-
-<button class="button" onclick="clientClick()">Click Me</button>
+<div id="content">
+    <button id="button1" type='button'>Loading...</button>
+    <button id="button2" type='button'>Loading...</button>
+</div>
 
 </body>
 </html>

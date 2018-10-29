@@ -1,4 +1,4 @@
-from flask import session, redirect, url_for, render_template, request
+from flask import render_template
 from . import main
 
 @main.route('/', methods=['GET', 'POST'])
