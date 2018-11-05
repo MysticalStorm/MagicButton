@@ -43,3 +43,4 @@ def test_connect():
 def click(array):
     print array
     processClick(array)
+    socketio.sleep(0)
